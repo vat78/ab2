@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vat78.alfa.ab2.dto.AnalyticData;
 import ru.vat78.alfa.ab2.dto.UserAnalytic;
+import ru.vat78.alfa.ab2.exceptions.NotFoundException;
 import ru.vat78.alfa.ab2.service.AnalyticsService;
 
 import java.util.AbstractMap;
@@ -35,19 +36,19 @@ public class AnalyticController {
 
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserAnalytic getAnalyticByUser(@PathVariable String userId){
-        return convertToDto(analyticsService.getUserData(userId));
+        return analyticsService.getUserData(userId)
+                .map(this::convertToDto)
+                .orElseThrow(NotFoundException::new);
     }
 
     @GetMapping(path = "/{userId}/templates", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTemplatesByUser(@PathVariable String userId){
-
-        return "";
+        throw new NotFoundException();
     }
 
     @GetMapping(path = "/{userId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getStatsByUser(@PathVariable String userId){
-
-        return "";
+        throw new NotFoundException();
     }
 
     private AnalyticData convertToDto(AnalyticsService.AnalyticsData data) {

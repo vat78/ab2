@@ -7,6 +7,7 @@ import ru.vat78.alfa.ab2.model.Payment;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AnalyticsService {
@@ -28,8 +29,8 @@ public class AnalyticsService {
         return dataByUser.values();
     }
 
-    public UserData getUserData(String userId) {
-        return dataByUser.getOrDefault(userId, new UserData(userId));
+    public Optional<UserData> getUserData(String userId) {
+        return Optional.ofNullable(dataByUser.get(userId));
     }
 
     @Data
