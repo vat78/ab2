@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vat78.alfa.ab2.dto.AnalyticData;
+import ru.vat78.alfa.ab2.dto.PaymentTemplate;
 import ru.vat78.alfa.ab2.dto.UserAnalytic;
 import ru.vat78.alfa.ab2.dto.UserStats;
 import ru.vat78.alfa.ab2.exceptions.NotFoundException;
@@ -43,8 +44,9 @@ public class AnalyticController {
     }
 
     @GetMapping(path = "/{userId}/templates", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getTemplatesByUser(@PathVariable String userId){
-        throw new NotFoundException();
+    public List<PaymentTemplate> getTemplatesByUser(@PathVariable String userId){
+        return analyticsService.getUserTemplates(userId)
+                .orElseThrow(NotFoundException::new);
     }
 
     @GetMapping(path = "/{userId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)

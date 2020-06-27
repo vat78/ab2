@@ -2,20 +2,31 @@ package ru.vat78.alfa.ab2.service;
 
 import lombok.Data;
 import org.springframework.stereotype.Service;
+import ru.vat78.alfa.ab2.dto.PaymentTemplate;
 import ru.vat78.alfa.ab2.dto.UserStats;
+import ru.vat78.alfa.ab2.model.Counter;
 import ru.vat78.alfa.ab2.model.Payment;
+import ru.vat78.alfa.ab2.model.ShortPayment;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AnalyticsService {
 
     private Map<String, UserData> dataByUser = new HashMap<>();
+    private Map<String, Map<ShortPayment, Counter>> paymentsStat = new HashMap<>();
 
     public void addPayment(Payment payment) {
         String userId = payment.getUserId();
         dataByUser.put(userId,
                 dataByUser.getOrDefault(userId, new UserData(userId)).addNewData(payment.getCategoryId(), payment.getAmount()));
+
+        ShortPayment statsKey = ShortPayment.getShortPayment(payment);
+        Map<ShortPayment, Counter> stat = paymentsStat.getOrDefault(userId, new HashMap<>());
+        Counter cntr = stat.getOrDefault(statsKey, new Counter());
+        stat.put(statsKey, cntr.increase());
+        paymentsStat.put(userId, stat);
     }
 
     public Collection<UserData> getAllAnalytic() {
@@ -29,6 +40,26 @@ public class AnalyticsService {
     public Optional<UserStats> getUserStats(String userId) {
         return Optional.ofNullable(dataByUser.get(userId))
                 .map(this::calcStatistics);
+    }
+
+    public Optional<List<PaymentTemplate>> getUserTemplates(String userId) {
+        Map<ShortPayment, Counter> stat = paymentsStat.get(userId);
+        if (stat == null) {
+            return Optional.empty();
+        }
+        return Optional.of(stat.entrySet().stream()
+                .filter(e -> e.getValue().getCounter() >2)
+                .map(Map.Entry::getKey)
+                .map(this::buildPaymentTemplate)
+                .collect(Collectors.toList()));
+    }
+
+    private PaymentTemplate buildPaymentTemplate(ShortPayment payment) {
+        return PaymentTemplate.builder()
+                .recipientId(payment.getRecipientId())
+                .categoryId(payment.getCategoryId())
+                .amount(payment.getAmount())
+                .build();
     }
 
     private UserStats calcStatistics(UserData userData) {
