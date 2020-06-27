@@ -14,7 +14,7 @@ spring:
       bootstrap-servers: 130.193.48.189:29092
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      group-id: ab2-25
+      group-id: ab2-27
       auto-offset-reset: earliest
 
 management:

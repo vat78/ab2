@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vat78.alfa.ab2.dto.AnalyticData;
 import ru.vat78.alfa.ab2.dto.UserAnalytic;
+import ru.vat78.alfa.ab2.dto.UserStats;
 import ru.vat78.alfa.ab2.exceptions.NotFoundException;
 import ru.vat78.alfa.ab2.service.AnalyticsService;
 
@@ -47,8 +48,9 @@ public class AnalyticController {
     }
 
     @GetMapping(path = "/{userId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getStatsByUser(@PathVariable String userId){
-        throw new NotFoundException();
+    public UserStats getStatsByUser(@PathVariable String userId){
+        return analyticsService.getUserStats(userId)
+                .orElseThrow(NotFoundException::new);
     }
 
     private AnalyticData convertToDto(AnalyticsService.AnalyticsData data) {
